@@ -74,7 +74,7 @@ jobs:
               echo "binding.gyp available: attempting native rebuild"
               cd node_modules/better-sqlite3
               "$PYTHON" --version
-              node /opt/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild
+              node /opt/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild --release --force_build=1
               cd /work
             else
               echo "No binding.gyp shipped with better-sqlite3@13.0.3: source compilation from this npm package is unavailable"
