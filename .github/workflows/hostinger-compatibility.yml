@@ -53,7 +53,9 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/src:ro" -w /work rockylinux:8 /bin/bash -lc '
             set -euo pipefail
-            dnf install -y curl tar gzip xz gcc gcc-c++ make python3 >/dev/null
+            dnf install -y curl tar gzip xz gcc gcc-c++ make python39 >/dev/null
+            export PYTHON=/usr/bin/python3.9
+            "$PYTHON" --version
             curl -fsSL https://nodejs.org/dist/v22.16.0/node-v22.16.0-linux-x64.tar.xz -o /tmp/node.tar.xz
             mkdir -p /opt/node
             tar -xJf /tmp/node.tar.xz -C /opt/node --strip-components=1
