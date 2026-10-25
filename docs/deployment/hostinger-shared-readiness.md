@@ -29,3 +29,26 @@ Target: `agente.fitowaylabs.com.br`. Compatibility work lives only on branch `ho
 
 ## Safety
 Do not overwrite the existing subdomain, delete its files, create database schemas, change DNS, or merge the PR until the application-level smoke test and backup plan pass. No Hostinger credentials are stored in this document.
+
+## Hostinger preflight (added on compatibility branch)
+
+Run only after Node.js dependencies, the matching compiled SQLite native addon, the Next build, and environment variables are present:
+
+```sh
+node scripts/ops/hostinger-preflight.mjs
+```
+
+The preflight is non-destructive: its SQLite CRUD check uses `:memory:`. It checks Node engine, build output, `DATA_DIR` and writable permissions, key environment variables and default SQLite native binding. A passing result is **necessary but not sufficient**: it does not prove the web server, WebSockets, proxy, streaming or scheduled tasks will work.
+
+Hostinger Node.js runtime settings must be checked in the application builder. Use a persistent, absolute `DATA_DIR` outside deploy/build folders. Set `JWT_SECRET` and `API_KEY_SECRET` to independent cryptographically random values and set a strong `INITIAL_PASSWORD` for first boot. Keep all secrets in Hostinger environment settings, never in GitHub.
+
+**Important:** `better-sqlite3` from the npm package defaults to a binary requiring GLIBC 2.29 on this target. The Rocky Linux 8 compatibility test compiles a GLIBC 2.28-compatible binary and substitutes it at the expected prebuild location. A regular `npm install` on Hostinger may replace that binary, so the production packaging process must preserve and verify it.
+
+### Readiness decision
+
+- Native SQLite probe: PASS in isolated Rocky Linux 8 container.
+- Full application startup on Hostinger: NOT YET VERIFIED.
+- GitHub CI / Quality Gates: FAIL under draft PR admission policy; full tests skipped.
+- Actual Hostinger deployment: NOT PERFORMED.
+
+Do not mark this release ready until a real Node.js runtime preflight and HTTP health smoke test pass.
