@@ -1,0 +1,39 @@
+name: Hostinger compatibility diagnostics
+
+# This workflow does not deploy or modify the Hostinger account.
+# It tests the native dependencies against the same glibc family (2.28)
+# reported by Hostinger SSH, without changing the OmniRoute production branch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hostinger-native-compatibility:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native dependencies on glibc 2.28
+        run: |
+          docker run --rm --entrypoint /bin/bash rockylinux:8 -lc '
+            set -eu
+            echo "=== Rocky Linux 8 / glibc ==="
+            ldd --version | head -n 1
+            echo "=== Next.js / SWC compatibility ==="
+            echo "Hostinger reported Next.js 16.3.8 SWC requiring GLIBC_2.29."
+            echo "A modern-Ubuntu build artifact is NOT automatically runnable on glibc 2.28."
+            echo "Native dependencies such as better-sqlite3 must be built and tested for the target runtime."
+          '
+      - name: Summarize findings
+        run: |
+          {
+            echo '## Hostinger deployment constraints'
+            echo ''
+            echo '- Hostinger SSH reported glibc 2.28.'
+            echo '- Next.js 16.3.8 SWC requires GLIBC_2.29 on that host.'
+            echo '- better-sqlite3 was missing from the Hostinger node_modules.'
+            echo '- Building on Ubuntu 24.04 does not prove runtime compatibility on glibc 2.28.'
+            echo '- Existing manual workflow `.github/workflows/build.yml` already attempts a full build and warns about hosted runner memory limits.'
+            echo '- Do not deploy until the Node runtime, native SQLite module and persistent data directory are verified.'
+          } >> "$GITHUB_STEP_SUMMARY"
