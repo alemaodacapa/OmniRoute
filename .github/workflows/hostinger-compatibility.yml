@@ -63,6 +63,9 @@ jobs:
             ldd --version | sed -n '1p'
             mkdir -p /work && cd /work
             npm init -y >/dev/null
-            npm install --save-exact --build-from-source better-sqlite3@13.0.3
+            npm install --save-exact better-sqlite3@13.0.3
+            npm rebuild better-sqlite3 --build-from-source
+            echo "=== Compiled SQLite binding dependencies ==="
+            ldd node_modules/better-sqlite3/build/Release/better_sqlite3.node
             node -e "const DB=require(\"better-sqlite3\"); const db=new DB(\":memory:\"); console.log(\"SQLite runtime:\", db.prepare(\"select sqlite_version() AS v\").get()); db.close()"
           '
