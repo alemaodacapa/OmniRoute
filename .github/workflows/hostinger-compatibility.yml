@@ -86,5 +86,5 @@ jobs:
             find node_modules/better-sqlite3 -name '*.node' -type f -print
             test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node
             ldd node_modules/better-sqlite3/build/Release/better_sqlite3.node
-            node -e "const DB=require(\"better-sqlite3\"); const db=new DB(\":memory:\"); console.log(\"SQLite runtime:\", db.prepare(\"select sqlite_version() AS v\").get()); db.close()"
+            node -e "const DB=require(\"better-sqlite3\"); const db=new DB(\":memory:\", {nativeBinding: \"./node_modules/better-sqlite3/build/Release/better_sqlite3.node\"}); console.log(\"SQLite runtime:\", db.prepare(\"select sqlite_version() AS v\").get()); db.close()"
           '
