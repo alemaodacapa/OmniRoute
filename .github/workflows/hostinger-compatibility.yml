@@ -24,7 +24,7 @@ jobs:
           docker run --rm --entrypoint /bin/bash rockylinux:8 -lc '
             set -eu
             echo "=== Rocky Linux 8 / glibc ==="
-            ldd --version | head -n 1
+            ldd --version | sed -n "1p"
             echo "=== Next.js / SWC compatibility ==="
             echo "Hostinger reported Next.js 16.3.8 SWC requiring GLIBC_2.29."
             echo "A modern-Ubuntu build artifact is NOT automatically runnable on glibc 2.28."
