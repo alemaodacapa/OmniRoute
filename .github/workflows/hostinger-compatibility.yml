@@ -65,7 +65,21 @@ jobs:
             ldd --version | sed -n '1p'
             mkdir -p /work && cd /work
             npm init -y >/dev/null
-            npm_config_build_from_source=true npm install --save-exact better-sqlite3@13.0.3
+            npm install --save-exact better-sqlite3@13.0.3
+            echo "=== Package build metadata ==="
+            node -e "const p=require(\"./node_modules/better-sqlite3/package.json\"); console.log(JSON.stringify({version:p.version,scripts:p.scripts},null,2))"
+            ls -la node_modules/better-sqlite3
+            echo "=== Source availability ==="
+            if test -f node_modules/better-sqlite3/binding.gyp; then
+              echo "binding.gyp available: attempting native rebuild"
+              cd node_modules/better-sqlite3
+              "$PYTHON" --version
+              node /opt/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild
+              cd /work
+            else
+              echo "No binding.gyp shipped with better-sqlite3@13.0.3: source compilation from this npm package is unavailable"
+              exit 1
+            fi
             echo "=== Compiled SQLite binding dependencies ==="
             find node_modules/better-sqlite3 -name '*.node' -type f -print
             test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node
