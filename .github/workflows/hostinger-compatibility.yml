@@ -60,7 +60,7 @@ jobs:
             export PATH=/opt/node/bin:$PATH
             node --version
             npm --version
-            ldd --version | head -n 1
+            ldd --version | sed -n '1p'
             mkdir -p /work && cd /work
             npm init -y >/dev/null
             npm install --save-exact --build-from-source better-sqlite3@13.0.3
