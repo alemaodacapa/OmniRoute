@@ -33,7 +33,7 @@ jobs:
             mkdir -p app
             printf "export default function Page(){return <main>Hostinger Next probe</main>}" > app/page.jsx
             printf "export default function RootLayout({children}){return <html><body>{children}</body></html>}" > app/layout.jsx
-            printf "const config = { output: \"standalone\" }; module.exports = config;" > next.config.cjs
+            printf "export default { output: \"standalone\" };" > next.config.mjs
             npm install --no-audit --no-fund
             echo "=== SWC native probe ==="
             node -e "try { require(\"@next/swc-linux-x64-gnu\"); console.log(\"Native SWC loaded\") } catch(e) { console.log(\"Native SWC unavailable:\", e.message) }"
