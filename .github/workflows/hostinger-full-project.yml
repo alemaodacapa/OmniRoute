@@ -50,7 +50,7 @@ jobs:
             npm_config_build_from_source=true npm rebuild better-sqlite3
             echo "=== Force native addon compilation (npm rebuild may only reuse prebuild) ==="
             cd node_modules/better-sqlite3
-            node /work/node_modules/node-gyp/bin/node-gyp.js rebuild --release --python=/usr/bin/python3.9
+            node /work/node_modules/node-gyp/bin/node-gyp.js rebuild --release --python=/usr/bin/python3.9 --enable-library
             cd /work
             echo "=== Locate locally compiled addon ==="
             find node_modules/better-sqlite3 -name better_sqlite3.node -print
