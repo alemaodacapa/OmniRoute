@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Provision swap for memory-intensive build
         run: |
           sudo fallocate -l 12G /mnt/omniroute-swap || sudo dd if=/dev/zero of=/mnt/omniroute-swap bs=1M count=12288
