@@ -19,14 +19,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Provision swap for memory-intensive build
         run: |
-          sudo fallocate -l 8G /mnt/omniroute-swap || sudo dd if=/dev/zero of=/mnt/omniroute-swap bs=1M count=8192
+          sudo fallocate -l 12G /mnt/omniroute-swap || sudo dd if=/dev/zero of=/mnt/omniroute-swap bs=1M count=12288
           sudo chmod 600 /mnt/omniroute-swap
           sudo mkswap /mnt/omniroute-swap
           sudo swapon /mnt/omniroute-swap
           free -h
       - name: Build real OmniRoute with GLIBC 2.28 and SWC WASM
         run: |
-          docker run --rm --memory=6g --memory-swap=14g -v "$PWD:/src:ro" rockylinux:8 /bin/bash -lc '
+          docker run --rm --memory=7g --memory-swap=19g -v "$PWD:/src:ro" rockylinux:8 /bin/bash -lc '
             set -euo pipefail
             dnf install -y curl tar xz git findutils make gcc gcc-c++ python39 gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ >/dev/null
             source /opt/rh/gcc-toolset-12/enable
@@ -43,7 +43,7 @@ jobs:
             tar -C /src --exclude=.git -cf - . | tar -xf -
             export NEXT_TELEMETRY_DISABLED=1 OMNIROUTE_USE_TURBOPACK=0 NEXT_DIST_DIR=.build/next
             export ONNXRUNTIME_NODE_INSTALL=skip
-            export NODE_OPTIONS=--max-old-space-size=5120
+            export NODE_OPTIONS=--max-old-space-size=8192
             echo "=== Install exact project dependencies ==="
             npm ci --no-audit --no-fund
             echo "=== Validate native SQLite ==="
