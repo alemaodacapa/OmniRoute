@@ -3,6 +3,10 @@ name: Hostinger full OmniRoute compatibility
 # Experimental full-project validation; does not deploy to Hostinger.
 on:
   workflow_dispatch:
+  push:
+    branches: [hostinger-build-compatibility]
+    paths:
+      - .github/workflows/hostinger-full-project.yml
 
 permissions:
   contents: read
