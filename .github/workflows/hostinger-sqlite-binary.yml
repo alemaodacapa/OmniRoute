@@ -45,7 +45,7 @@ jobs:
             cp prebuilds/linux-x64.node /output/better_sqlite3.node
             sha256sum /output/better_sqlite3.node > /output/SHA256SUMS
           '
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: better-sqlite3-node22-rocky8-glibc228
           path: hostinger-sqlite-artifact/
