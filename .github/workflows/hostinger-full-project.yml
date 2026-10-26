@@ -48,6 +48,13 @@ jobs:
             npm ci --no-audit --no-fund
             echo "=== Validate native SQLite ==="
             npm_config_build_from_source=true npm rebuild better-sqlite3
+            echo "=== Locate locally compiled addon ==="
+            find node_modules/better-sqlite3 -name better_sqlite3.node -print
+            test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node
+            mkdir -p node_modules/better-sqlite3/prebuilds
+            cp node_modules/better-sqlite3/build/Release/better_sqlite3.node node_modules/better-sqlite3/prebuilds/linux-x64.node
+            echo "=== Check native addon GLIBC requirements ==="
+            ldd node_modules/better-sqlite3/prebuilds/linux-x64.node
             node -e "const DB=require(\"better-sqlite3\"); const db=new DB(\":memory:\"); console.log(db.prepare(\"select sqlite_version() as v\").get()); db.close()"
             echo "=== Build full OmniRoute ==="
             npm run build
