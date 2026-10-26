@@ -18,7 +18,7 @@ jobs:
   hostinger-native-compatibility:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Test native dependencies on glibc 2.28
         run: |
           docker run --rm --entrypoint /bin/bash rockylinux:8 -lc '
@@ -48,7 +48,7 @@ jobs:
   native-sqlite-probe:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check better-sqlite3 on glibc 2.28 / Node 22
         run: |
           docker run --rm -v "$PWD:/src:ro" -w /work rockylinux:8 /bin/bash -lc '
