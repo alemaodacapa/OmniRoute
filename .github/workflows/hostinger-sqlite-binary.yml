@@ -35,13 +35,13 @@ jobs:
             echo "=== Inspect native binding source ==="
             ls -l binding.gyp src
             echo "=== Compile from sources with node-gyp ==="
-            node /work/node_modules/node-gyp/bin/node-gyp.js rebuild --release
+            node /work/node_modules/node-gyp/bin/node-gyp.js rebuild --release --force_build=1
             echo "=== Verify native binary ==="
             test -s build/Release/better_sqlite3.node
             mkdir -p prebuilds
             cp build/Release/better_sqlite3.node prebuilds/linux-x64.node
             ldd prebuilds/linux-x64.node
-            node -e "const DB=require("/work/node_modules/better-sqlite3");const db=new DB(":memory:");db.exec("create table test (id integer)");db.prepare("insert into test values (?)").run(42);if(db.prepare("select id from test").get().id!==42)process.exit(1);db.close();console.log("SQLite native CRUD: PASS")"
+            node -e "const DB=require(\"/work/node_modules/better-sqlite3\");const db=new DB(\":memory:\");db.exec(\"create table test (id integer)\");db.prepare(\"insert into test values (?)\").run(42);if(db.prepare(\"select id from test\").get().id!==42)process.exit(1);db.close();console.log(\"SQLite native CRUD: PASS\")"
             cp prebuilds/linux-x64.node /output/better_sqlite3.node
             sha256sum /output/better_sqlite3.node > /output/SHA256SUMS
           '
