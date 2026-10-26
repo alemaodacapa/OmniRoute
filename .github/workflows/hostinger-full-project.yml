@@ -1,0 +1,59 @@
+name: Hostinger full OmniRoute compatibility
+
+# Experimental full-project validation; does not deploy to Hostinger.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-build-rocky8:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provision swap for memory-intensive build
+        run: |
+          sudo fallocate -l 8G /mnt/omniroute-swap || sudo dd if=/dev/zero of=/mnt/omniroute-swap bs=1M count=8192
+          sudo chmod 600 /mnt/omniroute-swap
+          sudo mkswap /mnt/omniroute-swap
+          sudo swapon /mnt/omniroute-swap
+          free -h
+      - name: Build real OmniRoute with GLIBC 2.28 and SWC WASM
+        run: |
+          docker run --rm --memory=6g --memory-swap=14g -v "$PWD:/src:ro" rockylinux:8 /bin/bash -lc '
+            set -euo pipefail
+            dnf install -y curl tar xz git make gcc gcc-c++ python39 gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ >/dev/null
+            source /opt/rh/gcc-toolset-12/enable
+            export PYTHON=/usr/bin/python3.9
+            curl -fsSL https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-x64.tar.xz -o /tmp/node.tar.xz
+            mkdir -p /opt/node
+            tar -xJf /tmp/node.tar.xz -C /opt/node --strip-components=1
+            export PATH=/opt/node/bin:$PATH
+            echo "=== Runtime ==="
+            node --version
+            ldd --version | sed -n "1p"
+            mkdir -p /work
+            cd /work
+            tar -C /src --exclude=.git -cf - . | tar -xf -
+            export NEXT_TELEMETRY_DISABLED=1 OMNIROUTE_USE_TURBOPACK=0 NEXT_DIST_DIR=.build/next
+            export ONNXRUNTIME_NODE_INSTALL=skip
+            export NODE_OPTIONS=--max-old-space-size=5120
+            echo "=== Install exact project dependencies ==="
+            npm ci --no-audit --no-fund
+            echo "=== Validate native SQLite ==="
+            npm_config_build_from_source=true npm rebuild better-sqlite3
+            node -e "const DB=require(\"better-sqlite3\"); const db=new DB(\":memory:\"); console.log(db.prepare(\"select sqlite_version() as v\").get()); db.close()"
+            echo "=== Build full OmniRoute ==="
+            npm run build
+            test -f .build/next/BUILD_ID
+            echo "Full OmniRoute build: PASS"
+            echo "=== Check standalone output ==="
+            if test -f .build/next/standalone/server.js; then
+              echo "Standalone server present"
+            else
+              echo "Standalone server not at standard path; inspect custom assembly"
+              find .build -name server.js -print | head -20
+            fi
+          '
